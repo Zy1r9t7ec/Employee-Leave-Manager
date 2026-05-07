@@ -19,7 +19,9 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // Routes
 const leaveRoutes = require('./routes/leaveRoutes');
+const balanceRoutes = require('./routes/balanceRoutes');
 app.use('/api', leaveRoutes);
+app.use('/api', balanceRoutes);
 app.get('/', (req, res) => {
   res.json({ message: 'Employee Leave Management API - Server Running' });
 });
@@ -32,6 +34,9 @@ app.use((err, req, res, next) => {
     message: err.message || 'Server Error'
   });
 });
+
+// Start cron scheduler
+require('./utils/scheduler');
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
