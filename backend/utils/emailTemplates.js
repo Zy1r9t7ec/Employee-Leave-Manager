@@ -26,7 +26,7 @@ exports.leaveSubmittedConfirmation = (employee, leave) => ({
 });
 
 exports.leaveApprovedEmail = (employee, leave, comment = '') => ({
-  subject: '✅ Your Leave Request Has Been Approved',
+  subject: 'Your Leave Request Has Been Approved',
   html: `
     <h2>Great news, ${employee.name}!</h2>
     <p>Your leave request has been <b>approved</b>!</p>
@@ -37,7 +37,7 @@ exports.leaveApprovedEmail = (employee, leave, comment = '') => ({
 });
 
 exports.leaveRejectedEmail = (employee, leave, comment) => ({
-  subject: '❌ Your Leave Request Has Been Rejected',
+  subject: 'Your Leave Request Has Been Rejected',
   html: `
     <h2>Hi ${employee.name},</h2>
     <p>Unfortunately, your leave request has been <b>rejected</b>.</p>

@@ -14,10 +14,12 @@ mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-.then(() => console.log('✓ MongoDB connected'))
-.catch(err => console.error('✗ MongoDB error:', err));
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('MongoDB error:', err));
 
-// Routes (will be added here)
+// Routes
+const leaveRoutes = require('./routes/leaveRoutes');
+app.use('/api', leaveRoutes);
 app.get('/', (req, res) => {
   res.json({ message: 'Employee Leave Management API - Server Running' });
 });
@@ -33,5 +35,5 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`✓ Server running on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
