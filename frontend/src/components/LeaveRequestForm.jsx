@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 
-const LeaveRequestForm = () => {
+const LeaveRequestForm = ({ onSuccess }) => {
   const [formData, setFormData] = useState({
     leaveType: 'annual',
     startDate: '',
@@ -36,10 +36,8 @@ const LeaveRequestForm = () => {
     }
 
     try {
-      const token = localStorage.getItem('token');
-      await axios.post('/api/leaves', formData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      
+      await api.post('/api/leaves', formData);
       setMessage('Leave request submitted successfully.');
       setFormData({
         leaveType: 'annual',
@@ -47,6 +45,7 @@ const LeaveRequestForm = () => {
         endDate: '',
         reason: ''
       });
+      if (onSuccess) onSuccess();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to submit leave request.');
     } finally {

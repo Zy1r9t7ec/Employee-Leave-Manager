@@ -4,7 +4,7 @@ const LeaveRequest = require('../models/LeaveRequest');
 const LeaveBalance = require('../models/LeaveBalance');
 const User = require('../models/User');
 const BalanceAdjustmentLog = require('../models/BalanceAdjustmentLog');
-const calculateWorkingDays = require('../utils/calculateDays');
+const { calculateWorkingDays } = require('../utils/calculateDays');
 const { sendEmail } = require('../utils/sendEmail');
 const { leaveApprovedEmail, leaveRejectedEmail, leaveSubmittedConfirmation } = require('../utils/emailTemplates');
 
@@ -54,11 +54,15 @@ exports.submitLeaveRequest = async (req, res, next) => {
     });
     await leave.save();
 
-    // 4️⃣ Send Confirmation Email
-    const employee = await User.findById(employeeId);
-    if (employee && employee.email) {
-      const emailContent = leaveSubmittedConfirmation(employee, leave);
-      await sendEmail(employee.email, emailContent.subject, emailContent.html);
+    // 4. Send Confirmation Email (non-fatal - system continues even if mail fails)
+    try {
+      const employee = await User.findById(employeeId);
+      if (employee && employee.email) {
+        const emailContent = leaveSubmittedConfirmation(employee, leave);
+        await sendEmail(employee.email, emailContent.subject, emailContent.html);
+      }
+    } catch (mailErr) {
+      console.warn('Email notification failed (non-fatal):', mailErr.message);
     }
 
     res.status(201).json({ success: true, data: leave });
@@ -138,10 +142,14 @@ exports.approveLeave = async (req, res, next) => {
     leave.reviewedAt = new Date();
     await leave.save();
 
-    // Send email
-    if (leave.employeeId.email) {
-      const emailContent = leaveApprovedEmail(leave.employeeId, leave, comment);
-      await sendEmail(leave.employeeId.email, emailContent.subject, emailContent.html);
+    // Send email (non-fatal)
+    try {
+      if (leave.employeeId.email) {
+        const emailContent = leaveApprovedEmail(leave.employeeId, leave, comment);
+        await sendEmail(leave.employeeId.email, emailContent.subject, emailContent.html);
+      }
+    } catch (mailErr) {
+      console.warn('Approval email failed (non-fatal):', mailErr.message);
     }
 
     res.json({ success: true, data: leave });
@@ -175,13 +183,31 @@ exports.rejectLeave = async (req, res, next) => {
     leave.reviewedAt = new Date();
     await leave.save();
 
-    // Send email
-    if (leave.employeeId.email) {
-      const emailContent = leaveRejectedEmail(leave.employeeId, leave, comment);
-      await sendEmail(leave.employeeId.email, emailContent.subject, emailContent.html);
+    // Send email (non-fatal)
+    try {
+      if (leave.employeeId.email) {
+        const emailContent = leaveRejectedEmail(leave.employeeId, leave, comment);
+        await sendEmail(leave.employeeId.email, emailContent.subject, emailContent.html);
+      }
+    } catch (mailErr) {
+      console.warn('Rejection email failed (non-fatal):', mailErr.message);
     }
 
     res.json({ success: true, data: leave });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * GET /api/leaves/my-history
+ * Returns all leave requests submitted by the currently authenticated employee.
+ */
+exports.getMyHistory = async (req, res, next) => {
+  try {
+    const employeeId = req.user.id;
+    const leaves = await LeaveRequest.find({ employeeId }).sort({ submittedAt: -1 });
+    res.json({ success: true, data: leaves });
   } catch (err) {
     next(err);
   }

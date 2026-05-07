@@ -109,3 +109,23 @@ exports.adjustBalance = async (req, res, next) => {
     next(err);
   }
 };
+
+/**
+ * GET /api/balances/my-balance
+ * Returns the leave balance for the currently authenticated user.
+ */
+exports.getMyBalance = async (req, res, next) => {
+  try {
+    const year = new Date().getFullYear();
+    const employeeId = req.user.id;
+    
+    const balance = await LeaveBalance.findOne({ employeeId, year });
+    if (!balance) {
+      return res.status(404).json({ success: false, message: 'Balance record not found.' });
+    }
+    
+    res.json({ success: true, data: balance });
+  } catch (err) {
+    next(err);
+  }
+};

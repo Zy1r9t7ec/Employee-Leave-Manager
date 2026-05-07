@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api';
 
 const PendingRequestsTable = () => {
   const [requests, setRequests] = useState([]);
@@ -18,10 +18,7 @@ const PendingRequestsTable = () => {
 
   const fetchRequests = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('/api/leaves/pending', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.get('/api/leaves/pending');
       setRequests(response.data.data);
     } catch (err) {
       setError('Failed to load pending requests.');
@@ -50,13 +47,7 @@ const PendingRequestsTable = () => {
 
     setSubmitting(true);
     try {
-      const token = localStorage.getItem('token');
-      await axios.patch(`/api/leaves/${activeRequest._id}/${actionType}`, 
-        { comment },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      
-      // Remove the processed request from the list
+      await api.patch(`/api/leaves/${activeRequest._id}/${actionType}`, { comment });
       setRequests(requests.filter(r => r._id !== activeRequest._id));
       closeModal();
     } catch (err) {

@@ -15,12 +15,14 @@ exports.generateReport = async (req, res, next) => {
     
     // Fetch all approved leaves for the given month/year
     const startDate = new Date(year, month - 1, 1);
+    startDate.setHours(0, 0, 0, 0);
     const endDate = new Date(year, month, 0);
+    endDate.setHours(23, 59, 59, 999);
     
     const approvedLeaves = await LeaveRequest.find({
       status: 'Approved',
-      startDate: { $gte: startDate },
-      endDate: { $lte: endDate }
+      startDate: { $lte: endDate },
+      endDate: { $gte: startDate }
     }).populate('employeeId');
     
     // Group leaves by department
@@ -64,11 +66,31 @@ exports.generateReport = async (req, res, next) => {
     const tomcatUrl = process.env.TOMCAT_URL || 'http://localhost:8080';
     res.json({
       success: true,
-      reportUrl: `${tomcatUrl}/reports/monthly.jsp?data=${encodeURIComponent(JSON.stringify(reportData))}`
+      reportUrl: `${tomcatUrl}/reports/monthly.jsp?data=${encodeURIComponent(JSON.stringify(reportData))}`,
+      reportData // Also send the raw data so the frontend can display/download CSV if Tomcat is unavailable
     });
     
   } catch (error) {
     console.error('Report generation error:', error);
     next(error);
+  }
+};
+
+/**
+ * GET /api/admin/leaves
+ * Retrieves all leave requests in the system for HR Admin overview.
+ */
+exports.getAllLeaves = async (req, res, next) => {
+  try {
+    const leaves = await LeaveRequest.find({})
+      .populate('employeeId', 'name email department')
+      .sort({ submittedAt: -1 });
+    
+    res.json({
+      success: true,
+      data: leaves
+    });
+  } catch (err) {
+    next(err);
   }
 };
