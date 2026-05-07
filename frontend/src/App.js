@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import SubmitLeavePage from './pages/SubmitLeavePage';
 import ManagerApprovalPage from './pages/ManagerApprovalPage';
+import AdminReportsPage from './pages/AdminReportsPage';
 function App() {
   return (
     <Router>
@@ -11,6 +12,7 @@ function App() {
           <Route path="/" element={<Navigate to="/submit-leave" />} />
           <Route path="/submit-leave" element={<SubmitLeavePage />} />
           <Route path="/approvals" element={<ManagerApprovalPage />} />
+          <Route path="/admin/reports" element={<AdminReportsPage />} />
         </Routes>
       </AuthProvider>
     </Router>

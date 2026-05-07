@@ -20,8 +20,10 @@ mongoose.connect(process.env.MONGO_URI, {
 // Routes
 const leaveRoutes = require('./routes/leaveRoutes');
 const balanceRoutes = require('./routes/balanceRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 app.use('/api', leaveRoutes);
 app.use('/api', balanceRoutes);
+app.use('/api', adminRoutes);
 app.get('/', (req, res) => {
   res.json({ message: 'Employee Leave Management API - Server Running' });
 });
