@@ -28,6 +28,15 @@ app.get('/', (req, res) => {
   res.json({ message: 'Employee Leave Management API - Server Running' });
 });
 
+// Health check endpoint for monitoring
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'up', 
+    timestamp: new Date(), 
+    uptime: process.uptime() 
+  });
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);

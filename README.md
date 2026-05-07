@@ -36,3 +36,15 @@ All documentation is in the `/docs` folder. Start with [docs/README.md](docs/REA
 ## Project Structure
 
 See [docs/13-folder-structure.md](docs/13-folder-structure.md) for detailed folder organization.
+
+## Deployment & Monitoring (Phase 5)
+
+This application is configured for robust production deployment:
+- **CI/CD:** Github Actions pipeline configured in `.github/workflows/ci.yml`.
+- **Monitoring:** Uptime and health can be monitored via `GET /api/health`.
+- **Production Infrastructure:**
+  - Frontend: Deployable to Netlify or Vercel.
+  - Backend: Node.js/Express deployable to AWS EC2, Heroku, or Render.
+  - Database: MongoDB Atlas.
+  - Reporting: Apache Tomcat for serving `.jsp` files (can run parallel on backend VM).
+  - Email: Configure `MAIL_*` env vars to a production SMTP provider like SendGrid.
