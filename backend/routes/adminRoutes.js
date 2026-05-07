@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { generateReport } = require('../controllers/adminController');
+const { protect, restrictTo } = require('../middleware/authMiddleware');
+const { generateReport, getAllLeaves } = require('../controllers/adminController');
 
-// GET /api/admin/report - HR Admin Phase
-router.get('/admin/report', generateReport);
+router.get('/admin/report', protect, restrictTo('admin'), generateReport);
+router.get('/admin/leaves', protect, restrictTo('admin'), getAllLeaves);
 
 module.exports = router;

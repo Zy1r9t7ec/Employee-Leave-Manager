@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { resetAnnualBalances, adjustBalance } = require('../controllers/balanceController');
+const { protect } = require('../middleware/authMiddleware');
+const { resetAnnualBalances, adjustBalance, getMyBalance } = require('../controllers/balanceController');
 
-// POST /api/balances/reset - HR Admin phase (Manual Reset)
-router.post('/balances/reset', resetAnnualBalances);
-
-// POST /api/balances/adjust - HR Admin phase (Manual Adjustment/Carryover)
-router.post('/balances/adjust', adjustBalance);
+router.post('/balances/reset', protect, resetAnnualBalances);
+router.post('/balances/adjust', protect, adjustBalance);
+router.get('/balances/my-balance', protect, getMyBalance);
 
 module.exports = router;
